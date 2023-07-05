@@ -2,9 +2,9 @@
   "name": "groupe5challengemt4back",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "tsc && nodemon src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +21,9 @@
     "sql": "^0.78.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
+    "@types/mysql": "^2.15.21",
     "@types/node": "^20.3.3",
     "@types/nodemailer": "^6.4.8",
     "nodemon": "^2.0.22",

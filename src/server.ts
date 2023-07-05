@@ -1,22 +1,18 @@
-const express = require("express");
-const db = require("../config/db");
+import express, { Request, Response} from 'express';
+import cors from 'cors';
+import routes from './routes'
+import db from './config/db'
+
 const port = process.env.PORTSERV || 3050;
-const cors = require("cors");
-
 const app = express();
-
-
-
-//Middleware qui permet de traiter les données de la req
-
+// Middleware qui permet de traiter les données de la req
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(function (err, req, res, next) {
-  console.error(err.stack);
-  res.status(500).send("Erreur serveur");
-});
 
-app.use("/", require("./routes/post.routes"));
+
+
+app.use('/', routes);
+
 // Lancer le serveur
-app.listen(port, () => console.log("Le serveur a démarré au port " + port));
+app.listen(port, () => console.log(`Le serveur a démarré au port ${port}`));
