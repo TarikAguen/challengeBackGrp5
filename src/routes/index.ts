@@ -1,9 +1,9 @@
 import express from 'express';
-const {test} = require("../controller/post.controller")
+const {connexion, addEmail} = require("../controller/post.controller")
 
 const router = express.Router();
 
-router.get('/testy');
-router.get('/');
+router.post('/', addEmail);
+router.get('/tt');
 
 export default router;
