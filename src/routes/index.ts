@@ -1,9 +1,11 @@
 import express from 'express';
-const {connexion, addEmail} = require("../controller/post.controller")
+const {addUserEmail} = require("../controller/post.controller")
+
+
 
 const router = express.Router();
 
-router.post('/', addEmail);
+router.post('/', addUserEmail);
 router.get('/tt');
 
 export default router;

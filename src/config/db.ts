@@ -1,19 +1,24 @@
-import mysql from 'mysql';
+import mysql from 'mysql2/promise';
 
 const db = mysql.createPool({
-  host: '127.0.0.1',
+  host: 'localhost',
   port: 3306,
-  user: 'sqluser',
-  password: 'root',
+  user: 'root',
+  password: 'rootpassword',
   database: 'challengefinal',
   connectionLimit: 10,
 });
 
-db.getConnection((error: mysql.MysqlError | null) => {
-  if (error) {
+export const getConnection = async () => {
+  try {
+    const connection = await db.getConnection();
+    console.log('Connexion à la base de données réussie !');
+    return connection;
+  } catch (error: any) {
+    console.error('Erreur lors de la connexion à la base de données :', error.message);
     throw error;
   }
-  console.log('La base de données est maintenant opérationnelle.');
-});
+};
 
+getConnection();
 export default db;
