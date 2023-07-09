@@ -1,4 +1,6 @@
 import Mailjet from 'node-mailjet'
+require('dotenv').config();
+
 
 const mailjet = new Mailjet({
     apiKey: process.env.MJ_APIKEY_PUBLIC,
@@ -6,6 +8,7 @@ const mailjet = new Mailjet({
 });
 
 export const sendMail = async (token: string, receiver: string) => {
+    console.log(process.env.MJ_APIKEY_PUBLIC);
     const request = mailjet
     .post('send', {version : 'v3.1'})
     .request({
@@ -18,7 +21,7 @@ export const sendMail = async (token: string, receiver: string) => {
             To: [{Email: receiver}],
             Subject: 'Voici votre lien d\'accès !',
             TextPart: 'Lien de connexion',
-            HTMLPart: '',
+            HTMLPart: `<p>Lien de connexion : <a href="http://localhost:3050/?token=${token}">http://localhost:3050/?token=${token}</a></p>`,
             CustomID: '1'
 
         }
@@ -28,5 +31,7 @@ export const sendMail = async (token: string, receiver: string) => {
         await request
     }   catch (error: any) {
         console.error(error.statusCode)
+        
     }
+    
 }
