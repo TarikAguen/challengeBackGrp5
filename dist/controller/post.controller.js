@@ -14,9 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addUserEmail = void 0;
 const db_1 = __importDefault(require("../config/db"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const crypto_1 = __importDefault(require("crypto"));
-const mailjet_1 = require("../authentification/mailjet");
+const mailjet_1 = require("../mailing/mailjet");
+const createToken_1 = require("../utils/createToken");
+const decryptJWT_1 = require("../utils/decryptJWT");
 const addUserEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email } = req.body;
@@ -44,20 +44,28 @@ const addUserEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             return res.status(200).json({ message: "Connecté avec succès", user });
         }
         // Générez la clé secrète
-        const generateSecretKey = () => {
-            const length = 32; // Longueur de la clé en octets (256 bits)
-            return crypto_1.default.randomBytes(length).toString('hex');
-        };
-        const secretKey = generateSecretKey();
         // Générez le JWT
-        const expiresIn = '7d'; // Durée de validité du JWT, dans cet exemple 7 jours
-        const token = jsonwebtoken_1.default.sign({ email }, secretKey, { expiresIn });
+        // const expiresIn = '7d'; // Durée de validité du JWT, dans cet exemple 7 jours
+        // const token = jwt.sign({ email }, secretKey, { expiresIn });
         // Envoyez l'e-mail avec le JWT
-        yield (0, mailjet_1.sendMail)(token, email);
-        // Insérez l'e-mail dans la base de données
-        const query = 'INSERT INTO user (email) VALUES (?)';
-        yield db_1.default.query(query, [email]);
-        return res.status(200).json({ message: "L'e-mail a été ajouté avec succès." });
+        try {
+            const EmailQuery = 'INSERT INTO user (email, promotion) VALUES (?, "challenge unix")';
+            const idQuery = 'SELECT id FROM user WHERE email = (?)';
+            yield db_1.default.query(EmailQuery, [email]);
+            let idUser = yield db_1.default.query(idQuery, [email]);
+            idUser = idUser[0][0].id;
+            const payload = { email, idUser };
+            const token = yield (0, createToken_1.createToken)(payload);
+            (0, decryptJWT_1.benchJWT)('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBvdGFjaXY0NjRAbmliYWNrLmNvbSIsImlkVXNlciI6MjYsImlhdCI6MTY4OTE5MzAxNSwiZXhwIjoxNjg5MTk2NjE1fQ.vjtALO1sdPLTmDrLy0-0tF7DTmolff09K_4ZVWYpGPU');
+            yield (0, mailjet_1.sendMail)(token, email);
+            const userEmail = email;
+            return res.status(200).json({ message: "E-mail envoyé, veuillez vérifier votre boîte mail.", token });
+        }
+        catch (error) {
+            console.error("Une erreur est survenue lors de l'envoi de l'e-mail :", error);
+            return res.status(500).json({ message: "Une erreur est survenue lors de l'envoi de l'e-mail." });
+        }
+        return res.status(200).json({ message: "L'e-mail a été ajouté avec succès.", email });
     }
     catch (error) {
         console.error("Une erreur est survenue lors de l'ajout de l'e-mail :", error);

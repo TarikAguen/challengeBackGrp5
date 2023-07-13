@@ -20,6 +20,7 @@ const mailjet = new node_mailjet_1.default({
     apiSecret: process.env.MJ_APIKEY_PRIVATE
 });
 const sendMail = (token, receiver) => __awaiter(void 0, void 0, void 0, function* () {
+   
     const request = mailjet
         .post('send', { version: 'v3.1' })
         .request({
@@ -32,7 +33,7 @@ const sendMail = (token, receiver) => __awaiter(void 0, void 0, void 0, function
                 To: [{ Email: receiver }],
                 Subject: 'Voici votre lien d\'accès !',
                 TextPart: 'Lien de connexion',
-                HTMLPart: '',
+                HTMLPart: `<p>Lien de connexion : <a href="http://localhost:3050/?token=${token}">http://localhost:3050/?token=${token}</a></p>`,
                 CustomID: '1'
             }
         ]
